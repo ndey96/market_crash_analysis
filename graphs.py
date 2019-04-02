@@ -30,7 +30,12 @@ recessions = [
 
 
 def plot_recessions():
-    #     ax.axvline(x=pd.to_datetime(f'20080915', format='%Y%m%d'), linestyle='dashed', color='grey')
+    # plt.axvline(x=pd.to_datetime(f'20080915', format='%Y%m%d'), linestyle='dashed', color='grey')
+    plt.axvspan(
+        pd.to_datetime('1987-10-18'),
+        pd.to_datetime('1987-10-20'),
+        alpha=0.1,
+        color='red')
     for r in recessions:
         plt.axvspan(
             pd.to_datetime(r[0]), pd.to_datetime(r[1]), alpha=0.1, color='gray')
@@ -174,6 +179,18 @@ with PdfPages('graphs.pdf') as pdf:
     plt.figure(figsize=(20, 10))
     plt.plot(federal_debt)
     plt.title('federal_debt')
+    plot_recessions()
+    pdf.savefig()
+    plt.close()
+
+    # GDP
+    df = pd.read_csv('data/GDP.csv')
+    df['DATE'] = pd.to_datetime(df['DATE'])
+    df = df.set_index('DATE')
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(df['GDP'])
+    plt.title('GDP')
     plot_recessions()
     pdf.savefig()
     plt.close()
