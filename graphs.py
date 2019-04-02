@@ -16,7 +16,7 @@ sandp_df = sandp_df.set_index('Date')
 # https://www.thebalance.com/the-history-of-recessions-in-the-united-states-3306011
 # https://en.wikipedia.org/wiki/List_of_economic_crises
 recessions = [
-    ('1953-07-01', '1953-05-01'),  # Post Korean War 6.1% unemployment
+    ('1953-07-01', '1954-05-01'),  # Post Korean War 6.1% unemployment
     ('1957-08-01', '1958-04-01'),  # 7.5% unemployment
     ('1960-04-01', '1961-02-01'),  # Richard Nixon 7.1% unemployment
     ('1969-12-01', '1970-11-01'),  # 6.1% unemployment (mild)
@@ -50,13 +50,13 @@ with PdfPages('graphs.pdf') as pdf:
     pdf.savefig()
     plt.close()
 
-    plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Close'])
-    plt.yscale('log')
-    plt.title('Close Log')
-    plot_recessions()
-    pdf.savefig()
-    plt.close()
+    # plt.figure(figsize=(20, 10))
+    # plt.plot(sandp_df['Close'])
+    # plt.yscale('log')
+    # plt.title('Close Log')
+    # plot_recessions()
+    # pdf.savefig()
+    # plt.close()
 
     plt.figure(figsize=(20, 10))
     plt.plot(sandp_df['Close'].pct_change())
@@ -65,19 +65,19 @@ with PdfPages('graphs.pdf') as pdf:
     pdf.savefig()
     plt.close()
 
-    plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Volume'])
-    plt.title('Volume')
-    plot_recessions()
-    pdf.savefig()
-    plt.close()
+    # plt.figure(figsize=(20, 10))
+    # plt.plot(sandp_df['Volume'])
+    # plt.title('Volume')
+    # plot_recessions()
+    # pdf.savefig()
+    # plt.close()
 
-    plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Volume'].pct_change())
-    plt.title('volume_pct_change')
-    plot_recessions()
-    pdf.savefig()
-    plt.close()
+    # plt.figure(figsize=(20, 10))
+    # plt.plot(sandp_df['Volume'].pct_change())
+    # plt.title('volume_pct_change')
+    # plot_recessions()
+    # pdf.savefig()
+    # plt.close()
 
     plt.figure(figsize=(20, 10))
     plt.plot(sandp_df['Close'].rolling(window=7).var())
@@ -86,16 +86,40 @@ with PdfPages('graphs.pdf') as pdf:
     pdf.savefig()
     plt.close()
 
+    # plt.figure(figsize=(20, 10))
+    # plt.plot(sandp_df['Volume'].pct_change().rolling(window=7).var())
+    # plt.title('volume_pct_change_var7')
+    # plot_recessions()
+    # pdf.savefig()
+    # plt.close()
+
     plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Volume'].pct_change().rolling(window=7).var())
-    plt.title('volume_pct_change_var7')
+    plt.plot(sandp_df['Close'].pct_change().rolling(window=7).var())
+    plt.title('close_pct_change_var7')
     plot_recessions()
     pdf.savefig()
     plt.close()
 
     plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Close'].pct_change().rolling(window=7).var())
-    plt.title('close_pct_change_var7')
+    plt.plot(sandp_df['Close'].pct_change().rolling(window=7).mean())
+    plt.title('close_pct_change_mean7')
+    plt.axhline(0)
+    plot_recessions()
+    pdf.savefig()
+    plt.close()
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(sandp_df['Close'].pct_change().rolling(window=30).mean())
+    plt.title('close_pct_change_mean30')
+    plt.axhline(0)
+    plot_recessions()
+    pdf.savefig()
+    plt.close()
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(sandp_df['Close'].pct_change().rolling(window=60).mean())
+    plt.axhline(0)
+    plt.title('close_pct_change_mean60')
     plot_recessions()
     pdf.savefig()
     plt.close()
@@ -194,3 +218,40 @@ with PdfPages('graphs.pdf') as pdf:
     plot_recessions()
     pdf.savefig()
     plt.close()
+
+    plt.figure(figsize=(20, 10))
+    plt.hist(sandp_df['Close'].pct_change().to_list())
+    plt.title('close pct_change hist')
+    pdf.savefig()
+    plt.close()
+
+    close_pct_changes = []
+    for r in recessions:
+        print(r)
+        recession_rows = sandp_df.loc[r[0]:r[1]]
+        start_row = recession_rows.head(1)
+        end_row = recession_rows.tail(1)
+
+        start_close = start_row['Close'].values[0]
+        end_close = end_row['Close'].values[0]
+        close_pct_changes.append((end_close - start_close) / end_close)
+
+    print(close_pct_changes)
+    # plot percentage change in close from start to end of each recession
+    plt.figure(figsize=(20, 10))
+    plt.hist(close_pct_changes)
+    # plt.scatter(
+    #     range(len(close_pct_changes)), sorted(close_pct_changes, reverse=True))
+    plt.title('close_pct_changes')
+    # plot_recessions()
+    pdf.savefig()
+    plt.close()
+
+    # plot percentage change in volume from start to end of each recession
+    # plot absolute change in close variance from start to end of each recession
+    # plot absolute change in volume variance from start to end of each recession
+    # plot percentage change in interest rates from start to end of each recession
+    # plot percentage change in consumer spending from start to end of each recession
+    # plot absolute change in inflation from start to end of each recession
+    # plot absolute change in unemployment rate from start to end of each recession
+    # plot percentage change in federal debt from start to end of each recession
