@@ -41,6 +41,20 @@ def plot_recessions():
             pd.to_datetime(r[0]), pd.to_datetime(r[1]), alpha=0.1, color='gray')
 
 
+def plot_thresh_preds(begin_thresh, end_thresh, signal):
+    predicted_recessions = []
+    predicted_start = None
+    for date, change in signal.iteritems():
+        if change < begin_thresh:
+            predicted_start = date
+        if (change > end_thresh) and (predicted_start != None):
+            predicted_recessions.append((predicted_start, date))
+            predicted_start = None
+
+    for pred_r in predicted_recessions:
+        plt.axvspan(pred_r[0], pred_r[1], alpha=0.1, color='green')
+
+
 with PdfPages('graphs.pdf') as pdf:
 
     plt.figure(figsize=(20, 10))
@@ -80,28 +94,46 @@ with PdfPages('graphs.pdf') as pdf:
     # plt.close()
 
     plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Close'].rolling(window=7).var())
+    plt.plot(sandp_df['Close'].rolling(closed='right', window=7).var())
     plt.title('close_var_7')
     plot_recessions()
     pdf.savefig()
     plt.close()
 
     # plt.figure(figsize=(20, 10))
-    # plt.plot(sandp_df['Volume'].pct_change().rolling(window=7).var())
+    # plt.plot(sandp_df['Volume'].pct_change().rolling(closed='right', window=7).var())
     # plt.title('volume_pct_change_var7')
     # plot_recessions()
     # pdf.savefig()
     # plt.close()
 
     plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Close'].pct_change().rolling(window=7).var())
+    plt.plot(sandp_df['Close'].pct_change().rolling(closed='right',
+                                                    window=7).var())
     plt.title('close_pct_change_var7')
     plot_recessions()
     pdf.savefig()
     plt.close()
 
     plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Close'].pct_change().rolling(window=7).mean())
+    plt.plot(sandp_df['Close'].pct_change().rolling(closed='right',
+                                                    window=30).var())
+    plt.title('close_pct_change_var30')
+    plot_recessions()
+    pdf.savefig()
+    plt.close()
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(sandp_df['Close'].pct_change().rolling(closed='right',
+                                                    window=60).var())
+    plt.title('close_pct_change_var60')
+    plot_recessions()
+    pdf.savefig()
+    plt.close()
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(sandp_df['Close'].pct_change().rolling(closed='right',
+                                                    window=7).mean())
     plt.title('close_pct_change_mean7')
     plt.axhline(0)
     plot_recessions()
@@ -109,7 +141,8 @@ with PdfPages('graphs.pdf') as pdf:
     plt.close()
 
     plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Close'].pct_change().rolling(window=30).mean())
+    plt.plot(sandp_df['Close'].pct_change().rolling(closed='right',
+                                                    window=30).mean())
     plt.title('close_pct_change_mean30')
     plt.axhline(0)
     plot_recessions()
@@ -117,7 +150,7 @@ with PdfPages('graphs.pdf') as pdf:
     plt.close()
 
     close_pct_change_mean60 = sandp_df['Close'].pct_change().rolling(
-        window=60).mean()
+        closed='right', window=60).mean().dropna()
     start_close_pct_change_mean60 = []
     end_close_pct_change_mean60 = []
     for r in recessions:
@@ -126,19 +159,23 @@ with PdfPages('graphs.pdf') as pdf:
         end_close_pct_change_mean60.append(recession_rows.tail(1).values[0])
     print(start_close_pct_change_mean60)
     print(end_close_pct_change_mean60)
+    begin_thresh = np.min(start_close_pct_change_mean60)
+    end_thresh = np.mean(end_close_pct_change_mean60)
+
     plt.figure(figsize=(20, 10))
     plt.plot(close_pct_change_mean60)
+    plot_thresh_preds(begin_thresh, end_thresh, close_pct_change_mean60)
     plt.axhline(0, color='black')
-    plt.axhline(np.min(start_close_pct_change_mean60), color='red')
-    plt.axhline(np.mean(end_close_pct_change_mean60), color='green')
-    plt.axhline(np.max(end_close_pct_change_mean60), color='green')
+    plt.axhline(begin_thresh, color='red')
+    plt.axhline(end_thresh, color='green')
     plt.title('close_pct_change_mean60')
     plot_recessions()
     pdf.savefig()
     plt.close()
 
     plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Close'].pct_change().rolling(window=90).mean())
+    plt.plot(sandp_df['Close'].pct_change().rolling(closed='right',
+                                                    window=90).mean())
     plt.axhline(0)
     plt.title('close_pct_change_mean90')
     plot_recessions()
@@ -146,7 +183,8 @@ with PdfPages('graphs.pdf') as pdf:
     plt.close()
 
     plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Close'].pct_change().rolling(window=120).mean())
+    plt.plot(sandp_df['Close'].pct_change().rolling(closed='right',
+                                                    window=120).mean())
     plt.axhline(0)
     plt.title('close_pct_change_mean120')
     plot_recessions()
