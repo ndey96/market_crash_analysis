@@ -116,10 +116,39 @@ with PdfPages('graphs.pdf') as pdf:
     pdf.savefig()
     plt.close()
 
+    close_pct_change_mean60 = sandp_df['Close'].pct_change().rolling(
+        window=60).mean()
+    start_close_pct_change_mean60 = []
+    end_close_pct_change_mean60 = []
+    for r in recessions:
+        recession_rows = close_pct_change_mean60.loc[r[0]:r[1]]
+        start_close_pct_change_mean60.append(recession_rows.head(1).values[0])
+        end_close_pct_change_mean60.append(recession_rows.tail(1).values[0])
+    print(start_close_pct_change_mean60)
+    print(end_close_pct_change_mean60)
     plt.figure(figsize=(20, 10))
-    plt.plot(sandp_df['Close'].pct_change().rolling(window=60).mean())
-    plt.axhline(0)
+    plt.plot(close_pct_change_mean60)
+    plt.axhline(0, color='black')
+    plt.axhline(np.min(start_close_pct_change_mean60), color='red')
+    plt.axhline(np.mean(end_close_pct_change_mean60), color='green')
+    plt.axhline(np.max(end_close_pct_change_mean60), color='green')
     plt.title('close_pct_change_mean60')
+    plot_recessions()
+    pdf.savefig()
+    plt.close()
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(sandp_df['Close'].pct_change().rolling(window=90).mean())
+    plt.axhline(0)
+    plt.title('close_pct_change_mean90')
+    plot_recessions()
+    pdf.savefig()
+    plt.close()
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(sandp_df['Close'].pct_change().rolling(window=120).mean())
+    plt.axhline(0)
+    plt.title('close_pct_change_mean120')
     plot_recessions()
     pdf.savefig()
     plt.close()
@@ -219,34 +248,47 @@ with PdfPages('graphs.pdf') as pdf:
     pdf.savefig()
     plt.close()
 
+    counts, bin_edges = np.histogram(
+        sandp_df['Close'].pct_change().abs().dropna().to_list(), bins=5000)
     plt.figure(figsize=(20, 10))
-    plt.hist(sandp_df['Close'].pct_change().to_list())
-    plt.title('close pct_change hist')
+    plt.loglog(bin_edges[:-1], counts, linestyle='None', marker='o')
+    plt.title('Close Pct Change Frequency')
+    plt.ylabel('Frequency of Close Pct Change')
+    plt.xlabel('Magnitude of Close Pct Change')
+    plt.loglog(
+        bin_edges[:-1], 0.002 * np.power(bin_edges[:-1], -2), color='red')
+    plt.ylim(0.8, 2e2)
     pdf.savefig()
     plt.close()
 
-    close_pct_changes = []
-    for r in recessions:
-        print(r)
-        recession_rows = sandp_df.loc[r[0]:r[1]]
-        start_row = recession_rows.head(1)
-        end_row = recession_rows.tail(1)
-
-        start_close = start_row['Close'].values[0]
-        end_close = end_row['Close'].values[0]
-        close_pct_changes.append((end_close - start_close) / end_close)
-
-    print(close_pct_changes)
-    # plot percentage change in close from start to end of each recession
+    counts, bin_edges = np.histogram(
+        sandp_df['Volume'].pct_change().abs().dropna().to_list(), bins=5000)
     plt.figure(figsize=(20, 10))
-    plt.hist(close_pct_changes)
-    # plt.scatter(
-    #     range(len(close_pct_changes)), sorted(close_pct_changes, reverse=True))
-    plt.title('close_pct_changes')
-    # plot_recessions()
+    plt.loglog(bin_edges[:-1], counts, linestyle='None', marker='o')
+    plt.title('Volume Pct Change Frequency')
+    plt.ylabel('Frequency of Volume Pct Change')
+    plt.xlabel('Magnitude of Volume Pct Change')
     pdf.savefig()
     plt.close()
 
+    # close_pct_changes = []
+    # for r in recessions:
+    #     print(r)
+    #     recession_rows = sandp_df.loc[r[0]:r[1]]
+    #     start_row = recession_rows.head(1)
+    #     end_row = recession_rows.tail(1)
+
+    #     start_close = start_row['Close'].values[0]
+    #     end_close = end_row['Close'].values[0]
+    #     close_pct_changes.append((end_close - start_close) / end_close)
+    # plt.figure(figsize=(20, 10))
+    # plt.hist(close_pct_changes)
+    # # plt.scatter(
+    # #     range(len(close_pct_changes)), sorted(close_pct_changes, reverse=True))
+    # plt.title('close_pct_changes')
+    # # plot_recessions()
+    # pdf.savefig()
+    # plt.close()
     # plot percentage change in volume from start to end of each recession
     # plot absolute change in close variance from start to end of each recession
     # plot absolute change in volume variance from start to end of each recession
