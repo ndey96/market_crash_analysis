@@ -261,6 +261,13 @@ with PdfPages('graphs.pdf') as pdf:
     pdf.savefig()
     plt.close()
 
+    plt.figure(figsize=(20, 10))
+    plt.plot(unemployment.pct_change())
+    plt.title('unemployment_rate pct_change')
+    plot_recessions()
+    pdf.savefig()
+    plt.close()
+
     # US government debt
     df = pd.read_csv('data/government_debt.csv')
     df['DATE'] = pd.to_datetime(df['DATE'])
