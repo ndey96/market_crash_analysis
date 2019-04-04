@@ -32,7 +32,7 @@ recessions = [
     ('2007-12-01', '2009-05-01'),  # 2008
 ]
 pred_style = {
-    'alpha': 0.2,
+    'alpha': 0.1,
     # 'fill': False,
     'facecolor': 'orange',
     'edgecolor': 'black',
@@ -57,7 +57,7 @@ def plot_recessions():
         plt.axvspan(
             pd.to_datetime(r[0]),
             pd.to_datetime(r[1]),
-            alpha=0.2,
+            alpha=0.1,
             facecolor='blue',
             edgecolor='black',
             hatch='//',
@@ -68,10 +68,10 @@ def plot_recessions():
 def plot_low_high_thresh_preds(begin_thresh, end_thresh, signal):
     plt.axhline(
         begin_thresh,
-        color='black',
+        color='orange',
         label='Prediction Thresholds',
         linestyle='dashed')
-    plt.axhline(end_thresh, color='black', linestyle='dashed')
+    plt.axhline(end_thresh, color='orange', linestyle='dashed')
     predicted_recessions = []
     predicted_start = None
     for date, val in signal.iteritems():
@@ -90,10 +90,10 @@ def plot_low_high_thresh_preds(begin_thresh, end_thresh, signal):
 def plot_low_high_cole_thresh_preds(begin_thresh, end_thresh, signal):
     plt.axhline(
         begin_thresh,
-        color='black',
+        color='orange',
         label='Prediction Thresholds',
         linestyle='dashed')
-    plt.axhline(end_thresh, color='black', linestyle='dashed')
+    plt.axhline(end_thresh, color='orange', linestyle='dashed')
     predicted_recessions = []
     predicted_start = None
     predicted_end = None
@@ -118,10 +118,10 @@ def plot_low_high_cole_thresh_preds(begin_thresh, end_thresh, signal):
 def plot_low_high_cole_thresh_preds2(begin_thresh, end_thresh, signal):
     plt.axhline(
         begin_thresh,
-        color='black',
+        color='orange',
         label='Prediction Thresholds',
         linestyle='dashed')
-    plt.axhline(end_thresh, color='black', linestyle='dashed')
+    plt.axhline(end_thresh, color='orange', linestyle='dashed')
     predicted_recessions = []
     predicted_start = None
     predicted_end = None
