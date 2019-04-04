@@ -10,6 +10,7 @@ register_matplotlib_converters()
 plt.rc('axes', labelsize=25)
 plt.rc('xtick', labelsize=18)
 plt.rc('ytick', labelsize=18)
+plt.rc('legend', fontsize=18)
 
 sandp_df = pd.read_csv('data/^GSPC.csv', sep=',')
 sandp_df['Date'] = pd.to_datetime(sandp_df['Date'])
@@ -78,7 +79,7 @@ def plot_low_high_thresh_preds(begin_thresh, end_thresh, signal):
         if val < begin_thresh:
             predicted_start = date
         elif (val > end_thresh) and (predicted_start != None):
-            if (date - predicted_start).days >= 90:
+            if (date - predicted_start).days >= 45:
                 predicted_recessions.append((predicted_start, date))
             predicted_start = None
     label = 'Predicted Recession'
@@ -242,6 +243,32 @@ with PdfPages('graphs.pdf') as pdf:
         mins.append(recession_rows.min())
         maxs.append(recession_rows.max())
     maxs = np.array(maxs)
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(close_pct_change_var60.loc['2004-01-01':'2010-01-01'], label='')
+    plt.xlabel('Year')
+    plt.ylabel('Variance of % Change of S&P 500 Close')
+    plt.axvspan(
+        pd.to_datetime('2007-12-01'),
+        pd.to_datetime('2009-05-01'),
+        alpha=0.1,
+        facecolor='blue',
+        edgecolor='black',
+        hatch='//',
+        label='Recession')
+    plt.legend()
+    pdf.savefig()
+    plt.close()
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(close_pct_change_var60)
+    plt.xlabel('Year')
+    plt.ylabel('Variance of % Change of S&P 500 Close')
+    plot_recessions()
+    plt.legend()
+    pdf.savefig()
+    plt.close()
+
     plt.figure(figsize=(20, 10))
     plt.plot(close_pct_change_var60, label='')
     # plt.title('close_pct_change_var60')
@@ -291,6 +318,15 @@ with PdfPages('graphs.pdf') as pdf:
         recession_rows = close_pct_change_mean60.loc[r[0]:r[1]]
         min_close_pct_change_mean60.append(recession_rows.min())
         max_close_pct_change_mean60.append(recession_rows.max())
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(close_pct_change_mean60)
+    plt.xlabel('Year')
+    plt.ylabel('Mean of % Change of S&P 500 Close')
+    plot_recessions()
+    plt.legend()
+    pdf.savefig()
+    plt.close()
 
     plt.figure(figsize=(20, 10))
     plt.plot(close_pct_change_mean60, label='')
@@ -354,17 +390,25 @@ with PdfPages('graphs.pdf') as pdf:
 
     plt.figure(figsize=(20, 10))
     plt.plot(interest_rates_diff, label='')
+    # plt.title('consumer_spending_no_food_no_energy')
+    plot_recessions()
+    plt.xlabel('Year')
+    plt.ylabel('US Interest Rate Derivative')
+    plt.legend()
+    pdf.savefig()
+    plt.close()
+
+    plt.figure(figsize=(20, 10))
+    plt.plot(interest_rates_diff, label='')
     # plt.title('interest_rates diff 2a')
     plot_recessions()
-    max_interest_rates_diff = []
+    mins = []
     for r in recessions[1:7]:
         recession_rows = interest_rates_diff.loc[r[0]:r[1]]
-        max_interest_rates_diff.append(recession_rows.min())
+        mins.append(recession_rows.min())
 
     plot_low_high_cole_thresh_preds2(
-        begin_thresh=0,
-        end_thresh=np.max(max_interest_rates_diff),
-        signal=interest_rates_diff)
+        begin_thresh=0, end_thresh=np.max(mins), signal=interest_rates_diff)
     plt.xlabel('Year')
     plt.ylabel('US Interest Rate Derivative')
     plt.legend()
@@ -431,21 +475,35 @@ with PdfPages('graphs.pdf') as pdf:
     pdf.savefig()
     plt.close()
 
+    plt.figure(figsize=(20, 10))
+    plt.plot(unemployment.pct_change(), label='')
+    # plt.title('unemployment_rate')
+    plot_recessions()
+    plt.xlabel('Year')
+    plt.ylabel('% Change of US Unemployment Rate')
+    plt.legend()
+    pdf.savefig()
+    plt.close()
+
     unemployment_pct_change_mean6 = unemployment.pct_change().rolling(
         closed='right', window=6).mean()
-    start_unemployment_pct_change_mean6 = []
-    end_unemployment_pct_change_mean6 = []
-    max_unemployment_pct_change_mean6 = []
+    plt.figure(figsize=(20, 10))
+    plt.plot(unemployment_pct_change_mean6, label='')
+    # plt.title('unemployment_rate')
+    plot_recessions()
+    plt.xlabel('Year')
+    plt.ylabel('Mean % Change of US Unemployment Rate')
+    plt.legend()
+    pdf.savefig()
+    plt.close()
+
+    maxs = []
     for r in recessions[:7]:
         recession_rows = unemployment_pct_change_mean6.loc[r[0]:r[1]]
-        max_unemployment_pct_change_mean6.append(recession_rows.max())
-        start_unemployment_pct_change_mean6.append(
-            recession_rows.head(1).values[0])
-        end_unemployment_pct_change_mean6.append(
-            recession_rows.tail(1).values[0])
+        maxs.append(recession_rows.max())
 
     begin_thresh = 0  #np.mean(start_unemployment_pct_change_mean6)
-    end_thresh = np.min(max_unemployment_pct_change_mean6)
+    end_thresh = np.min(maxs)
 
     plt.figure(figsize=(20, 10))
     plt.plot(unemployment_pct_change_mean6, label='')
@@ -486,7 +544,7 @@ with PdfPages('graphs.pdf') as pdf:
     # plt.title('US GDP')
     plot_recessions()
     plt.xlabel('Year')
-    plt.ylabel('US GDP')
+    plt.ylabel('US GDP (Billions of USD)')
     plt.legend()
     pdf.savefig()
     plt.close()
