@@ -58,7 +58,7 @@ def plot_recessions():
             pd.to_datetime(r[0]),
             pd.to_datetime(r[1]),
             alpha=0.2,
-            facecolor='gray',
+            facecolor='blue',
             edgecolor='black',
             hatch='//',
             label=label)
